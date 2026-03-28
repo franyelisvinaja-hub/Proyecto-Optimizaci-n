@@ -1,87 +1,116 @@
 import streamlit as st
-import plotly.graph_objects as go
 import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
 
-# --- 1. CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(
-    page_title="Gemelo Digital: Gasoducto Trans-Andino",
-    page_icon="⛽",
-    layout="wide"
-)
+# --- CONFIGURACIÓN DE LA PÁGINA [cite: 35] ---
+st.set_page_config(page_title="Gemelo Digital: Gasoducto Trans-Andino", layout="wide")
 
-# Estilo personalizado corregido (unsafe_allow_html)
-st.markdown("""
-    <style>
-    .main { background-color: #f5f7f9; }
-    .stMetric { 
-        background-color: #ffffff; 
-        padding: 15px; 
-        border-radius: 10px; 
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.1); 
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# --- DATOS TÉCNICOS DEL PROYECTO [cite: 23, 25] ---
+TABLA_TUBERIAS = {
+    "12\"": {"D_ext": 323.8, "t": 10.31, "costo": 185},
+    "16\"": {"D_ext": 406.4, "t": 12.70, "costo": 260},
+    "20\"": {"D_ext": 508.0, "t": 15.09, "costo": 350},
+    "24\"": {"D_ext": 609.6, "t": 17.48, "costo": 440}
+}
+TABLA_ACERO = {
+    "X52": {"SMYS": 52000, "F": 0.72},
+    "X60": {"SMYS": 60000, "F": 0.72}
+}
 
-# --- 2. PANEL DE CONFIGURACIÓN (SIDEBAR)  ---
+# --- PANEL DE CONFIGURACIÓN (SIDEBAR) [cite: 36] ---
 with st.sidebar:
     st.header("⚙️ Configuración")
-    st.markdown("---")
-
-    # 1. Parámetros Económicos [cite: 37]
-    with st.expander("💰 Parámetros Económicos", expanded=True):
-        costo_energia = st.number_input("Costo Energía (USD/kWh)", value=0.12)
-        costo_acero = st.number_input("Costo Acero ($/m)", value=350)
-        tasa_interes = st.slider("Tasa de Interés (%)", 1, 20, 10)
     
-    # 2. Selección de Material [cite: 38]
-    with st.expander("🛠️ Selección de Material", expanded=True):
-        diam_comercial = st.selectbox("Diámetro Nominal (pulg)", ["12\"", "16\"", "20\"", "24\""])
-        grado_acero = st.radio("Grado del Acero", ["X52", "X60"])
-    
-    # 3. Variables Operativas [cite: 39]
-    with st.expander("🚀 Variables Operativas", expanded=True):
-        flujo_q = st.number_input("Flujo de Gas (Q) [MMscfd]", value=500.0)
-        n_estaciones = st.slider("N° Estaciones (N)", 1, 5, 2)
+    with st.expander("💰 Económicos [cite: 37]", expanded=True):
+        tasa = st.slider("Tasa de Interés (%)", 1, 20, 10) / 100
+        e_cost = st.number_input("Costo Energía (USD/kWh)", value=0.12)
+        
+    with st.expander("🛠️ Materiales [cite: 38]", expanded=True):
+        d_nom = st.selectbox("Diámetro Nominal", list(TABLA_TUBERIAS.keys()), index=2)
+        grado = st.selectbox("Grado de Acero", list(TABLA_ACERO.keys()))
+        
+    with st.expander("🚀 Operación [cite: 39]", expanded=True):
+        Q = st.number_input("Flujo (Q) [MMscfd]", value=500.0)
+        N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
-# --- 3. VISUALIZACIÓN PRINCIPAL (MAIN PANEL)  ---
-st.title("🏗️ Simulación: Gasoducto Trans-Andino")
-st.markdown("---")
+# --- VARIABLES BASE [cite: 14-20] ---
+L_total = 400.0  # km
+P_in = 800.0     # psia
+P_min_entrega = 500.0 # psia
+T1 = 293.15      # K (20°C)
+gamma = 0.65
+Z = 0.90
+E = 0.92         # Eficiencia de línea
+k = 1.3          # Constante adiabática
+R = 10.73
+n_isentr = 0.75  # Eficiencia compresión
+
+# --- CÁLCULOS HIDRÁULICOS (Weymouth) [cite: 28] ---
+d_ext_in = TABLA_TUBERIAS[d_nom]["D_ext"] / 25.4
+t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
+D = d_ext_in - 2 * t_in # Diámetro interno en pulgadas
+
+L_tramo = L_total / N
+distancias = np.linspace(0, L_total, 200)
+presiones = []
+P_actual = P_in
+
+# Simulación del perfil
+for d in distancias:
+    dist_tramo = d % L_tramo
+    if d > 0 and dist_tramo < (distancias[1] - distancias[0]):
+        P_actual = P_in # Re-compresión en cada estación
+    
+    # Ecuación de Weymouth: P1^2 - P2^2 = factor * L
+    factor = 433.5 * (Q/E)**2 * (gamma * T1 * Z) / (D**5.33)
+    P_calc = np.sqrt(max(1.0, P_in**2 - factor * dist_tramo))
+    presiones.append(P_calc)
+
+P_final = presiones[-1]
+
+# --- CÁLCULOS DE COMPRESIÓN Y COSTOS [cite: 31, 32] ---
+P_suc = presiones[int(len(presiones)/N)-1] # Presión al final del primer tramo
+HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T1/(k-1)) * ((P_in/P_suc)**((k-1)/k) - 1)
+HP_total = HP_estacion * N
+T2 = T1 * (P_in/P_suc)**((k-1)/k) - 273.15 # en Celsius
+
+# Costos (Simplificados para el ejemplo) [cite: 33]
+CAPEX_ducto = TABLA_TUBERIAS[d_nom]["costo"] * L_total * 1000
+CAPEX_comp = HP_total * 1500 # 1500 USD/HP
+OPEX = HP_total * 0.7457 * 8760 * e_cost # kW * horas_año * costo
+TAC = (CAPEX_ducto + CAPEX_comp) * tasa + OPEX
+
+# --- VISUALIZACIÓN PRINCIPAL [cite: 40] ---
+st.title("🏗️ Gemelo Digital: Gasoducto Trans-Andino")
 
 # 1. Dashboard de Métricas [cite: 41]
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("TAC Total", "$ --", help="Costo Total Anualizado [cite: 32]")
-with col2:
-    st.metric("Potencia Total", "-- HP", help="Potencia total instalada [cite: 41]")
-with col3:
-    st.metric("Presión Final", "-- psia", help="Presión de entrega [cite: 41]")
+m1, m2, m3 = st.columns(3)
+m1.metric("TAC Total", f"${TAC/1e6:.2f} M USD")
+m2.metric("Potencia Total", f"{HP_total:,.0f} HP")
+m3.metric("P. Entrega", f"{P_final:.1f} psia", delta=round(P_final-P_min_entrega,1))
 
-# Pestañas de Navegación
-tab1, tab2, tab3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "🛡️ Validación y Seguridad"])
+t1, t2, t3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "🛡️ Seguridad"])
 
-with tab1:
-    st.subheader("Perfil de Presión [psia] vs Distancia [km] [cite: 42]")
-    st.info("Este gráfico mostrará la caída por fricción y el incremento por compresión[cite: 43].")
-    # Gráfico vacío temporal
-    fig_p = go.Figure()
-    fig_p.update_layout(height=450, template="plotly_white", xaxis_title="Distancia (km)", yaxis_title="Presión (psia)")
-    st.plotly_chart(fig_p, use_container_width=True)
+with t1: # [cite: 42, 43]
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)"))
+    fig.add_hline(y=P_min_entrega, line_dash="dash", line_color="red")
+    fig.update_layout(title="Perfil de Presión Weymouth", xaxis_title="Distancia (km)", yaxis_title="Presión (psia)")
+    st.plotly_chart(fig, use_container_width=True)
 
-with tab2:
-    st.subheader("Análisis Económico (CAPEX vs OPEX) [cite: 44]")
-    st.write("*(Espacio para gráfico de barras o sectores)*")
+with t2: # [cite: 44]
+    st.bar_chart({"CAPEX Ducto": CAPEX_ducto*tasa, "CAPEX Comp": CAPEX_comp*tasa, "OPEX Energía": OPEX})
 
-with tab3:
-    st.subheader("Sistema de Validación y Alertas [cite: 45]")
-    c1, c2, c3 = st.columns(3)
-    # Alertas según el enunciado [cite: 46, 47, 48]
-    with c1:
-        st.warning("**Verificación MAOP:** Pendiente de cálculo.")
-    with c2:
-        st.warning("**Verificación Térmica:** Pendiente de cálculo.")
-    with c3:
-        st.warning("**Cumplimiento Entrega:** Pendiente de cálculo.")
-
-# Pie de Página
-st.markdown("---")
-st.caption("Proyecto: Optimización y Simulación Digital de Sistemas de Transporte de Gas | 2026-02-17 [cite: 1, 4]")
+with t3: # [cite: 45]
+    # MAOP (Límite Barlow) [cite: 46]
+    MAOP = (2 * TABLA_ACERO[grado]["SMYS"] * t_in * TABLA_ACERO[grado]["F"]) / d_ext_in
+    
+    if P_in > MAOP: st.error(f"❌ Riesgo MAOP: {P_in} > {MAOP:.0f} psia")
+    else: st.success(f"✅ Presión Segura (MAOP: {MAOP:.0f} psia)")
+    
+    if T2 > 65: st.error(f"❌ Alerta Térmica: {T2:.1f} °C > 65 °C [cite: 47]")
+    else: st.success(f"✅ Temperatura Segura ({T2:.1f} °C)")
+    
+    if P_final < P_min_entrega: st.error(f"❌ Presión insuficiente en entrega [cite: 48]")
+    else: st.success("✅ Entrega garantizada (>500 psia)")
