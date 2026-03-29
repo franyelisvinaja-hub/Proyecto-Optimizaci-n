@@ -131,7 +131,7 @@ for d in distancias:
         P_actual = P_in # Re-compresión en cada estación
     
     # Ecuación de Weymouth: P1^2 - P2^2 = factor * L
-    factor = 433.5 * (Q/E)**2 * (Gravedad_especifica * T * Z) / (D**5.33)
+    factor = 433.5 * (Q/E)**2 * (Gravedad_especifica * T_succion * Z) / (D**5.33)
     P_calc = np.sqrt(max(1.0, P_in**2 - factor * dist_tramo))
     presiones.append(P_calc)
 
@@ -139,9 +139,9 @@ P_final = presiones[-1]
 
 # --- CÁLCULOS DE COMPRESIÓN Y COSTOS  ---
 P_suc = presiones[int(len(presiones)/N)-1] # Presión al final del primer tramo
-HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T/(k-1)) * ((P_in/P_succion)**((k-1)/k) - 1)
+HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T_succion/(k-1)) * ((P_in/P_succion)**((k-1)/k) - 1)
 HP_total = HP_estacion * N
-T_total = T * (P_in/P_suc)**((k-1)/k) - 273.15 # en Celsius
+T_total = T_succion * (P_in/P_suc)**((k-1)/k) - 273.15 # en Celsius
 
 # Costos (Simplificados para el ejemplo) 
 CAPEX_ducto = TABLA_TUBERIAS[d_nom]["costo"] * L * 1000
