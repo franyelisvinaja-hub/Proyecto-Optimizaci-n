@@ -160,12 +160,40 @@ m3.metric("P. Entrega", f"{P_final:.0f} psia", delta=round(P_final-P_entrega,1))
 
 t1, t2, t3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "🛡️ Seguridad"])
 
-with t1: # 
+with t1: 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)"))
-    fig.add_hline(y=P_entrega, line_dash="dash", line_color="red", showline=true)
-    fig.update_layout(title="Perfil de Presión Weymouth", xaxis_title="<b>Distancia (km)</b>", yaxis_title="<b>Presión (psia)</b>")
-    st.plotly_chart(fig, use_container_width=True) 
+    fig.add_hline(y=P_min_entrega, line_dash="dash", line_color="red")
+    
+    fig.update_layout(
+        title="<b>Perfil de Presión Weymouth</b>", # Título en negrita
+        plot_bgcolor="white", # Fondo blanco para que resalte el marco
+        
+        # Configuración del Eje X
+        xaxis=dict(
+            title="<b>Distancia (km)</b>", # Nombre del eje en negrita
+            tickformat=".1f",
+            showline=True,    # Muestra la línea del eje
+            linewidth=2,      # Grosor de la línea
+            linecolor='black',# Color del marco
+            mirror=True,      # Refleja la línea arriba (cierra el cuadro)
+            ticks="outside",  # Pone las muescas hacia afuera
+            tickfont=dict(color='black', size=12) # Números más oscuros
+        ),
+        # Eje Y
+        yaxis=dict(
+            title="<b>Presión (psia)</b>", # Nombre del eje en negrita
+            tickformat=".2f",
+            showline=True,
+            linewidth=2,
+            linecolor='black',
+            mirror=True,
+            ticks="outside",
+            tickfont=dict(color='black', size=12)
+        )
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 with t2: # 
     st.bar_chart({"CAPEX Ducto": CAPEX_ducto*tasa, "CAPEX Comp": CAPEX_comp*tasa, "OPEX Energía": OPEX})
