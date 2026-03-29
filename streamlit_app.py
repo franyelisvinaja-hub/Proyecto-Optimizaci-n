@@ -201,5 +201,5 @@ with t3:
     else: st.success(f"✅ Presión Segura (MAOP: {MAOP:.0f} psia)")
     if T_out_C > 65: st.error(f"❌ Alerta Térmica: {T_out_C:.0f} °C > 65 °C")
     else: st.success(f"✅ Temperatura Segura ({T_out_C:.1f} °C)")
-    if P_final_real < P_min_entrega: st.error(f"❌ Presión insuficiente ({P_final_real:.f} < 500 psia)")
+    if P_final_real < P_min_entrega: st.error(f"❌ Presión insuficiente ({P_final_real:.0f} < 500 psia)")
     else: st.success(f"✅ Entrega garantizada ({P_final_real:.1f} psia)")
