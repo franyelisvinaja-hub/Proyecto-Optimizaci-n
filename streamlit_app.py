@@ -19,14 +19,12 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: #87CEEB; 
         color: black;
-     } 
-    /* Aplicar sombra suave a los widgets del sidebar */
-    [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] + div {
         border-radius: 8px;      /* Esquinas redondeadas */
         padding: 5px;            /* Espacio interno */
         box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave y difuminada */
         border: 1px solid #f0f2f6; /* Borde muy sutil */
-    }
+     } 
+   
     /* Sombra en widgets del sidebar al pasar el mouse */
     [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] + div:hover {
         box-shadow: 0 10px 15px rgba(0,0,0,0.3);
