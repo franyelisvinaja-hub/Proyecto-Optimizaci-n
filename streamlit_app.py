@@ -137,11 +137,14 @@ for d in distancias:
 
 P_final = presiones[-1]
 
-# --- CÁLCULOS DE COMPRESIÓN Y COSTOS  ---
-P_suc = presiones[int(len(presiones)/N)-1] # Presión al final del primer tramo
-HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T_succion/(k-1)) * ((P_in/P_entrega)**((k-1)/k) - 1)
+# --- CÁLCULOS DE COMPRESIÓN Y COSTOS ---
+P_suc = presiones[int(len(presiones)/N)-1] 
+r_comp = P_in / P_suc
+HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * \
+              (Z * R * T_succion / (k - 1)) * \
+              ((r_comp)**((k - 1) / k) - 1)
 HP_total = HP_estacion * N
-T_total = T_succion * (P_in/P_entrega)**((k-1)/k) - 273.15 # en Celsius
+T_total = T_succion * (r_comp)**((k - 1) / k) - 273.15 # Resultado en Celsius
 
 # Costos (Simplificados para el ejemplo) 
 CAPEX_ducto = TABLA_TUBERIAS[d_nom]["costo"] * L * 1000
