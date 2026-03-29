@@ -22,6 +22,7 @@ st.markdown("""
         div[data-testid="stWidgetLabel"] + div:hover {
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         transition: 0.3s;
+    } 
     }
 
     </style>
