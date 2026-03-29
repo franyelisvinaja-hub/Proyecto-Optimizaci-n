@@ -180,5 +180,5 @@ with t3: #
     if T_total > 65: st.error(f"❌ Alerta Térmica: {T_total:.1f} °C > 65 °C")
     else: st.success(f"✅ Temperatura Segura ({T_total:.1f} °C)")
     
-    if P_final < P_min_entrega: st.error(f"❌ Presión insuficiente en entrega")
+    if P_final < P_entrega: st.error(f"❌ Presión insuficiente en entrega")
     else: st.success("✅ Entrega garantizada (>500 psia)")
