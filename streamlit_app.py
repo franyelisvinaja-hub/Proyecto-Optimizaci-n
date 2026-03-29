@@ -93,7 +93,7 @@ with st.sidebar:
     with st.expander("🚀 Operación", expanded=True):
         Q = st.number_input("Flujo (Q) [MMscfd]", value=500.0)
         # CORRECCIÓN: P_in ahora es ajustable para que varíen las alertas MAOP [cite: 16]
-        P_in = st.number_input("Presión de Entrada (P1) [psia]", value=800.0, step=50.0)
+        P_in = st.number_input("Presión de Entrada [psia]", value=800.0, step=50.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
 # --- VARIABLES BASE [cite: 14-20] ---
@@ -172,7 +172,7 @@ with t1:
 with t2:
     st.bar_chart({"CAPEX Anual": (CAPEX_ducto + CAPEX_comp) * tasa, "OPEX Energía": OPEX})
 
-with t3: # [cite: 46-48]
+with t3:
     # MAOP (Límite Barlow) 
     MAOP = (2 * TABLA_ACERO[grado]["SMYS"] * t_in * TABLA_ACERO[grado]["F"]) / d_ext_in
     
