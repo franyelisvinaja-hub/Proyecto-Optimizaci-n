@@ -4,10 +4,10 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
+# CONFIGURACIÓN DE LA PÁGINA
 st.set_page_config(page_title="Gasoducto Trans-Andino", page_icon="👷🏼", layout="wide")
 
-# --- 1. PERSONALIZACIÓN DE INTERFAZ (CSS) ---
+# PERSONALIZACIÓN DE INTERFAZ (CSS)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -55,7 +55,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. ENCABEZADO ---
+# ENCABEZADO
 st.markdown("""
     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
         <img src="https://www.aga.org/wp-content/uploads/2023/05/Natural-Gas-Transport.jpg" 
@@ -71,7 +71,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 st.markdown("---") 
 
-# --- DATOS TÉCNICOS ---
+# DATOS TÉCNICOS
 TABLA_TUBERIAS = {
     "12\"": {"D_ext": 323.8, "t": 10.31, "costo": 185},
     "16\"": {"D_ext": 406.4, "t": 12.70, "costo": 260},
@@ -83,12 +83,12 @@ TABLA_ACERO = {
     "X60": {"SMYS": 60000, "F": 0.72}
 }
 
-# --- SIDEBAR ---
+# SIDEBAR
 with st.sidebar:
     st.header("⚙️ Configuración")
     with st.expander("💰 Económicos", expanded=True):
         tasa = st.slider("Tasa de Interés (%)", 1, 20, 10) / 100
-        e_cost = st.number_input("Costo Energía (USD/kWh)", value=0.12)
+        e_cost = st.number_input("Costo de Energía (USD/kWh)", value=0.12)
     with st.expander("🛠️ Materiales", expanded=True):
         d_nom = st.selectbox("Diámetro Nominal", list(TABLA_TUBERIAS.keys()), index=2)
         grado = st.selectbox("Grado de Acero", list(TABLA_ACERO.keys()))
@@ -97,18 +97,18 @@ with st.sidebar:
         P_in = st.number_input("Presión de Entrada [psia]", value=800.0, step=50.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
-# --- VARIABLES BASE [cite: 14-20] ---
-L = 400.0
-P_min_entrega = 500.0 
-T_succion = 293.15
-gamma = 0.65
-Z = 0.90
-E_eff = 0.92
-k = 1.3
-R_const = 10.73
-n_isentr = 0.75
+# VARIABLES BASE 
+L = 400.0                # Longitud (km)
+P_min_entrega = 500.0    # Presión de entrega mínima (psia)
+T_succion = 293.15       # Temperatura de succión (K)
+gamma = 0.65             # Gravedad específica (adim)
+Z = 0.90                 # Factor de compresibilidad (adim)
+E_eff = 0.92             # Factor de Weymouth: valor estándar para tuberías de acero nuevas o bien mantenidas
+k = 1.3                  # Constante adiabática: suele estar entre 1.26 y 1.33
+R_const = 10.73          # Constante de los gases en psia
+n_isentr = 0.75          # Eficiencia de compresión
 
-# --- CÁLCULOS HIDRÁULICOS ---
+# CÁLCULOS HIDRÁULICOS
 d_ext_in = TABLA_TUBERIAS[d_nom]["D_ext"] / 25.4
 t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
 D_int = d_ext_in - 2 * t_in 
@@ -122,7 +122,7 @@ for d in distancias:
     presiones.append(P_calc)
 P_final_real = presiones[-2] 
 
-# --- COMPRESIÓN Y COSTOS ---
+# COMPRESIÓN Y COSTOS
 P_suc_real = presiones[int(len(presiones)/N)-1] 
 r_comp = P_in / P_suc_real
 HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z * R_const * T_succion / (k - 1)) * ((r_comp)**((k - 1) / k) - 1)
@@ -134,10 +134,10 @@ CAPEX_comp_anual = (HP_total * 1500) * tasa
 OPEX = HP_total * 0.7457 * 8760 * e_cost 
 TAC = CAPEX_ducto_anual + CAPEX_comp_anual + OPEX
 
-# --- VISUALIZACIÓN ---
+# VISUALIZACIÓN DE RESULTADOS
 st.title("🏗️ Dashboard de Simulación")
 m1, m2, m3 = st.columns(3)
-m1.metric("TAC Total", f"${TAC/1e6:,.2f} M USD")
+m1.metric("TAC Total", f"${TAC/1e6:,.0f} M USD")
 m2.metric("Potencia Total", f"{HP_total:,.0f} HP")
 m3.metric("P. Entrega Final", f"{P_final_real:.1f} psia", delta=round(P_final_real - P_min_entrega, 1))
 
@@ -150,7 +150,6 @@ with t1:
     fig.update_layout(
         title="<b>Perfil de Presión Weymouth</b>",
         plot_bgcolor="white",
-        # Marco rectángular cerrado completo
         xaxis=dict(title="<b>Distancia (km)</b>", linewidth=2, linecolor='black', mirror='all', showline=True),
         yaxis=dict(title="<b>Presión (psia)</b>", linewidth=2, linecolor='black', mirror='all', showline=True)
     )
@@ -162,7 +161,6 @@ with t2:
         "Categoría": ["CAPEX Ducto", "CAPEX Compresión", "OPEX Energía"],
         "Costo Anual [USD]": [CAPEX_ducto_anual, CAPEX_comp_anual, OPEX]
     })
-    
     col_bar, col_pie = st.columns(2)
     with col_bar:
         fig_bar = px.bar(df_costos, x="Categoría", y="Costo Anual [USD]", color="Categoría",
@@ -184,7 +182,7 @@ with t2:
     st.markdown("### 📋 Tabla de Resumen Económico")
     df_tabla = df_costos.copy()
     df_tabla.index = df_tabla.index + 1
-    df_tabla["Costo Anual [USD]"] = df_tabla["Costo Anual [USD]"].map("${:,.2f}".format)
+    df_tabla["Costo Anual [USD]"] = df_tabla["Costo Anual [USD]"].map("${:,.0f}".format)
     df_tabla["Porcentaje (%)"] = (df_costos["Costo Anual [USD]"] / TAC * 100).map("{:.1f}%".format)
     # Mostramos la tabla con el estilo unificado
     st.table(df_tabla)
@@ -193,7 +191,7 @@ with t3:
     MAOP = (2 * TABLA_ACERO[grado]["SMYS"] * t_in * TABLA_ACERO[grado]["F"]) / d_ext_in
     if P_in > MAOP: st.error(f"❌ Riesgo MAOP: {P_in:.0f} > {MAOP:.0f} psia")
     else: st.success(f"✅ Presión Segura (MAOP: {MAOP:.0f} psia)")
-    if T_out_C > 65: st.error(f"❌ Alerta Térmica: {T_out_C:.1f} °C > 65 °C")
+    if T_out_C > 65: st.error(f"❌ Alerta Térmica: {T_out_C:.f} °C > 65 °C")
     else: st.success(f"✅ Temperatura Segura ({T_out_C:.1f} °C)")
-    if P_final_real < P_min_entrega: st.error(f"❌ Presión insuficiente ({P_final_real:.1f} < 500 psia)")
+    if P_final_real < P_min_entrega: st.error(f"❌ Presión insuficiente ({P_final_real:.f} < 500 psia)")
     else: st.success(f"✅ Entrega garantizada ({P_final_real:.1f} psia)")
