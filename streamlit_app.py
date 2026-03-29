@@ -19,8 +19,6 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: #87CEEB; 
         color: black;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5); /* Sombra suave y difuminada */
-        border: 1px solid #f0f2f6; /* Borde muy sutil */
      } 
    
     /* Sombra en widgets del sidebar al pasar el mouse */
