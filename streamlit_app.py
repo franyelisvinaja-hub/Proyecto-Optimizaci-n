@@ -120,7 +120,7 @@ t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
 D = d_ext_in - 2 * t_in # Diámetro interno en pulgadas
 
 L_tramo = L / N
-distancias = np.linspace(0, L_total, 200)
+distancias = np.linspace(0, L, 200)
 presiones = []
 P_actual = P_in
 
