@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="Gemelo Digital: Gasoducto Trans-Andino", layout="wide")
+st.set_page_config(page_title="Gasoducto Trans-Andino", layout="wide")
 
 # --- 1. PERSONALIZACIÓN DE INTERFAZ (CSS) ---
 st.markdown("""
@@ -44,7 +44,7 @@ st.markdown(f"""
         <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
         <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
     </div>
-    <p style="color: #666; font-size: 1.1em;">Gemelo Digital para la Simulación de Transporte de Gas Natural</p>
+    <p style="color: #666; font-size: 1.1em;">Transporte de Gas Natural</p>
     """, unsafe_allow_html=True)
 st.markdown("---")
 
