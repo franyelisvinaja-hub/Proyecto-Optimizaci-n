@@ -61,11 +61,13 @@ st.markdown("""
 st.markdown(
     """
     <div style="display: flex; justify-content: center;">
-        <img src="https://www.freepik.es/foto-gratis/vista-interior-fabrica-acero_1120217.htm#fromView=search&page=1&position=27&uuid=fa130987-2b10-429a-b819-b6a94f1dd209&query=transport+gas+natural+" 
+        <img src="https://www.aga.org/wp-content/uploads/2023/05/Natural-Gas-Transport.jpg" 
         style="width:1280px; height:150px; object-fit: cover; border-radius: 10px;">
     </div>
       <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
     </div>
+     <div style="display: flex; align-items: center;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
     <p style="color: #B0C4DE; font-size: 1.1em;">Transporte de Gas Natural</p>
     """, unsafe_allow_html=True)
 st.markdown("---") 
