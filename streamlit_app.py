@@ -70,7 +70,7 @@ st.markdown(
     </div>
      <div style="display: flex; align-items: center;">
         <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
-    <p style="color: #708090; font-size: 2.1em;">Transporte de Gas Natural</p>
+    <p style="color: #4682B4; font-size: 2.1em;">Transporte de Gas Natural</p>
     """, unsafe_allow_html=True)
 st.markdown("---") 
   
