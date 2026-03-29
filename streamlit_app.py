@@ -19,9 +19,7 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: #87CEEB; 
         color: black;
-        border-radius: 8px;      /* Esquinas redondeadas */
-        padding: 5px;            /* Espacio interno */
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave y difuminada */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5); /* Sombra suave y difuminada */
         border: 1px solid #f0f2f6; /* Borde muy sutil */
      } 
    
