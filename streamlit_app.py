@@ -19,14 +19,13 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: #87CEEB; 
         color: black;
-        div[data-testid="stWidgetLabel"] + div:hover {
+     } 
+    /* Sombra en widgets del sidebar al pasar el mouse */
+    [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] + div:hover {
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         transition: 0.3s;
-    } 
     }
 
-    </style>
-    """, unsafe_allow_html=True)
 
     div[data-testid="stMetricValue"] {
         font-size: 28px;
