@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Gasoducto Trans-Andino", page_icon="👷🏼", layout="wide")
@@ -10,43 +11,14 @@ st.set_page_config(page_title="Gasoducto Trans-Andino", page_icon="👷🏼", la
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    [data-testid="stSidebar"] { background-color: #87CEEB; color: black; }
+    div[data-testid="stMetricValue"] { font-size: 28px; color: #1f77b4; }
+    .stAlert { border-radius: 10px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-    }
-
-    [data-testid="stSidebar"] {
-        background-color: #87CEEB; 
-        color: black;
-    }
-
-    div[data-testid="stMetricValue"] {
-        font-size: 28px;
-        color: #1f77b4;
-    }
-    
-    .stAlert {
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    /* Colores personalizados para las alertas de Streamlit */
-    div[data-testid="stNotificationContentError"] {
-        background-color: #FDEDEC;
-        color: #943126;
-        border-left: 6px solid #CB4335;
-    }
-    div[data-testid="stNotificationContentWarning"] {
-        background-color: #FEF9E7;
-        color: #7D6608;
-        border-left: 6px solid #F4D03F;
-    }
-    div[data-testid="stNotificationContentSuccess"] {
-        background-color: #EAFAF1;
-        color: #186A3B;
-        border-left: 6px solid #27AE60;
-    }
+    div[data-testid="stNotificationContentError"] { background-color: #FDEDEC; color: #943126; border-left: 6px solid #CB4335; }
+    div[data-testid="stNotificationContentWarning"] { background-color: #FEF9E7; color: #7D6608; border-left: 6px solid #F4D03F; }
+    div[data-testid="stNotificationContentSuccess"] { background-color: #EAFAF1; color: #186A3B; border-left: 6px solid #27AE60; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -81,25 +53,21 @@ TABLA_ACERO = {
 # --- PANEL DE CONFIGURACIÓN (SIDEBAR) ---
 with st.sidebar:
     st.header("⚙️ Configuración")
-    
     with st.expander("💰 Económicos", expanded=True):
         tasa = st.slider("Tasa de Interés (%)", 1, 20, 10) / 100
         e_cost = st.number_input("Costo Energía (USD/kWh)", value=0.12)
-        
     with st.expander("🛠️ Materiales", expanded=True):
         d_nom = st.selectbox("Diámetro Nominal", list(TABLA_TUBERIAS.keys()), index=2)
         grado = st.selectbox("Grado de Acero", list(TABLA_ACERO.keys()))
-        
     with st.expander("🚀 Operación", expanded=True):
         Q = st.number_input("Flujo (Q) [MMscfd]", value=500.0)
-        # CORRECCIÓN: P_in ahora es ajustable para que varíen las alertas MAOP [cite: 16]
         P_in = st.number_input("Presión de Entrada [psia]", value=800.0, step=50.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
 # --- VARIABLES BASE [cite: 14-20] ---
-L = 400.0  # km
-P_min_entrega = 500.0 # psia
-T_succion = 293.15  # K (20°C)
+L = 400.0
+P_min_entrega = 500.0 
+T_succion = 293.15
 gamma = 0.65
 Z = 0.90
 E_eff = 0.92
@@ -111,44 +79,31 @@ n_isentr = 0.75
 d_ext_in = TABLA_TUBERIAS[d_nom]["D_ext"] / 25.4
 t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
 D_int = d_ext_in - 2 * t_in 
-
 L_tramo = L / N
 distancias = np.linspace(0, L, 200)
 presiones = []
-P_actual = P_in
-
 for d in distancias:
     dist_tramo = d % L_tramo
-    # Detectar estación de compresión (reinicio de presión)
-    if d > 0 and dist_tramo < (distancias[1] - distancias[0]):
-        P_actual = P_in
-    
     factor = 433.5 * (Q/E_eff)**2 * (gamma * T_succion * Z) / (D_int**5.33)
     P_calc = np.sqrt(max(1.0, P_in**2 - factor * dist_tramo))
     presiones.append(P_calc)
-
-# CORRECCIÓN: P_final_real captura la presión JUSTO ANTES de la última estación 
 P_final_real = presiones[-2] 
 
 # --- CÁLCULOS DE COMPRESIÓN Y COSTOS [cite: 31-33] ---
 P_suc_real = presiones[int(len(presiones)/N)-1] 
 r_comp = P_in / P_suc_real
-
-HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * \
-              (Z * R_const * T_succion / (k - 1)) * \
-              ((r_comp)**((k - 1) / k) - 1)
+HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z * R_const * T_succion / (k - 1)) * ((r_comp)**((k - 1) / k) - 1)
 HP_total = HP_estacion * N
 T_out_C = T_succion * (r_comp)**((k - 1) / k) - 273.15 
 
-CAPEX_ducto = TABLA_TUBERIAS[d_nom]["costo"] * L * 1000
-CAPEX_comp = HP_total * 1500 
+# Desglose de CAPEX
+CAPEX_ducto_anual = (TABLA_TUBERIAS[d_nom]["costo"] * L * 1000) * tasa
+CAPEX_comp_anual = (HP_total * 1500) * tasa 
 OPEX = HP_total * 0.7457 * 8760 * e_cost 
-TAC = (CAPEX_ducto + CAPEX_comp) * tasa + OPEX
+TAC = CAPEX_ducto_anual + CAPEX_comp_anual + OPEX
 
 # --- VISUALIZACIÓN PRINCIPAL ---
 st.title("🏗️ Dashboard de Simulación")
-
-# 1. Dashboard de Métricas [cite: 41]
 m1, m2, m3 = st.columns(3)
 m1.metric("TAC Total", f"${TAC/1e6:,.2f} M USD")
 m2.metric("Potencia Total", f"{HP_total:,.0f} HP")
@@ -160,33 +115,45 @@ with t1:
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)", line=dict(color='#1f77b4', width=3)))
     fig.add_hline(y=P_min_entrega, line_dash="dash", line_color="red")
-    
-    fig.update_layout(
-        title="<b>Perfil de Presión Weymouth</b>",
-        plot_bgcolor="white",
-        xaxis=dict(title="<b>Distancia (km)</b>", showgrid=True, gridcolor='lightgray', linewidth=2, linecolor='black', mirror=True),
-        yaxis=dict(title="<b>Presión (psia)</b>", showgrid=True, gridcolor='lightgray', linewidth=2, linecolor='black', mirror=True)
-    )
+    fig.update_layout(title="<b>Perfil de Presión Weymouth</b>", plot_bgcolor="white", xaxis=dict(title="<b>Distancia (km)</b>", showgrid=True, mirror=True, showline=True, linecolor='black'), yaxis=dict(title="<b>Presión (psia)</b>", showgrid=True, mirror=True, showline=True, linecolor='black'))
     st.plotly_chart(fig, use_container_width=True)
 
 with t2:
-    st.bar_chart({"CAPEX Anual": (CAPEX_ducto + CAPEX_comp) * tasa, "OPEX Energía": OPEX})
+    st.subheader("Análisis Económico Detallado")
+    
+    # Preparar datos para los gráficos
+    df_costos = pd.DataFrame({
+        "Categoría": ["CAPEX Ducto", "CAPEX Compresión", "OPEX Energía"],
+        "Costo Anual [USD]": [CAPEX_ducto_anual, CAPEX_comp_anual, OPEX]
+    })
+    
+    col_bar, col_pie = st.columns(2)
+    
+    with col_bar:
+        fig_bar = px.bar(df_costos, x="Categoría", y="Costo Anual [USD]", color="Categoría",
+                         color_discrete_sequence=["#1f77b4", "#7fb3d5", "#ff7f0e"],
+                         title="<b>Distribución de Costos Anuales</b>", text_auto='.2s')
+        fig_bar.update_layout(plot_bgcolor="white", showlegend=False)
+        st.plotly_chart(fig_bar, use_container_width=True)
+        
+    with col_pie:
+        fig_pie = px.pie(df_costos, values="Costo Anual [USD]", names="Categoría", hole=0.4,
+                         color_discrete_sequence=["#1f77b4", "#7fb3d5", "#ff7f0e"],
+                         title="<b>Peso del CAPEX vs OPEX</b>")
+        st.plotly_chart(fig_pie, use_container_width=True)
+    
+    # Tabla de Desglose [cite: 32]
+    st.markdown("### 📋 Tabla de Resumen Económico")
+    df_tabla = df_costos.copy()
+    df_tabla["Costo Anual [USD]"] = df_tabla["Costo Anual [USD]"].map("${:,.2f}".format)
+    df_tabla["Porcentaje (%)"] = (df_costos["Costo Anual [USD]"] / TAC * 100).map("{:.1f}%".format)
+    st.table(df_tabla)
 
 with t3:
-    # MAOP (Límite Barlow) 
     MAOP = (2 * TABLA_ACERO[grado]["SMYS"] * t_in * TABLA_ACERO[grado]["F"]) / d_ext_in
-    
-    if P_in > MAOP: 
-        st.error(f"❌ Riesgo MAOP: {P_in:.0f} > {MAOP:.0f} psia (Límite Barlow superado)")
-    else: 
-        st.success(f"✅ Presión de entrada segura (MAOP: {MAOP:.0f} psia)")
-    
-    if T_out_C > 65: 
-        st.error(f"❌ Alerta Térmica: {T_out_C:.1f} °C > 65 °C")
-    else: 
-        st.success(f"✅ Temperatura de descarga segura ({T_out_C:.1f} °C)")
-    
-    if P_final_real < P_min_entrega: 
-        st.error(f"❌ Presión de entrega insuficiente ({P_final_real:.1f} psia < 500 psia)")
-    else: 
-        st.success(f"✅ Entrega garantizada ({P_final_real:.1f} psia)")
+    if P_in > MAOP: st.error(f"❌ Riesgo MAOP: {P_in:.0f} > {MAOP:.0f} psia")
+    else: st.success(f"✅ Presión Segura (MAOP: {MAOP:.0f} psia)")
+    if T_out_C > 65: st.error(f"❌ Alerta Térmica: {T_out_C:.1f} °C > 65 °C")
+    else: st.success(f"✅ Temperatura Segura ({T_out_C:.1f} °C)")
+    if P_final_real < P_min_entrega: st.error(f"❌ Presión insuficiente ({P_final_real:.1f} < 500 psia)")
+    else: st.success(f"✅ Entrega garantizada ({P_final_real:.1f} psia)")
