@@ -64,11 +64,13 @@ st.markdown(
         <img src="https://www.aga.org/wp-content/uploads/2023/05/Natural-Gas-Transport.jpg" 
         style="width:1280px; height:150px; object-fit: cover; border-radius: 10px;">
     </div>
-      <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
+      <h1 style="margin: 0; color: #4682B4; font-family: sans-serif;">
+            Sistema de Optimización Trans-Andino
+        </h1>
     </div>
      <div style="display: flex; align-items: center;">
         <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
-    <p style="color: #B0C4DE; font-size: 1.1em;">Transporte de Gas Natural</p>
+    <p style="color: #708090; font-size: 2.1em;">Transporte de Gas Natural</p>
     """, unsafe_allow_html=True)
 st.markdown("---") 
   
