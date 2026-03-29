@@ -32,19 +32,23 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    /* ESTILO DE TABLA: Fondo blanco con líneas negras resaltantes */
+    /* ESTILO DE TABLA UNIFICADO: Blanco con líneas negras resaltantes */
     .stTable table {
         background-color: white !important;
         color: black !important;
         border: 2px solid black !important;
+        border-collapse: collapse !important;
     }
-    .stTable thead tr th {
-        background-color: #f0f2f6 !important; /* Gris muy claro para el encabezado */
+    /* Encabezados y columna de índice (th) */
+    .stTable thead tr th, .stTable tbody tr th {
+        background-color: white !important;
         color: black !important;
         border: 2px solid black !important;
-        font-weight: bold;
+        font-weight: bold !important;
     }
+    /* Celdas de datos (td) */
     .stTable tbody tr td {
+        background-color: white !important;
         border: 2px solid black !important;
         color: black !important;
     }
@@ -104,7 +108,7 @@ k = 1.3
 R_const = 10.73
 n_isentr = 0.75
 
-# --- CÁLCULOS HIDRÁULICOS (Weymouth) [cite: 28] ---
+# --- CÁLCULOS HIDRÁULICOS ---
 d_ext_in = TABLA_TUBERIAS[d_nom]["D_ext"] / 25.4
 t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
 D_int = d_ext_in - 2 * t_in 
@@ -118,7 +122,7 @@ for d in distancias:
     presiones.append(P_calc)
 P_final_real = presiones[-2] 
 
-# --- CÁLCULOS DE COMPRESIÓN Y COSTOS [cite: 31-33] ---
+# --- COMPRESIÓN Y COSTOS ---
 P_suc_real = presiones[int(len(presiones)/N)-1] 
 r_comp = P_in / P_suc_real
 HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z * R_const * T_succion / (k - 1)) * ((r_comp)**((k - 1) / k) - 1)
@@ -146,9 +150,9 @@ with t1:
     fig.update_layout(
         title="<b>Perfil de Presión Weymouth</b>",
         plot_bgcolor="white",
-        # Marco cerrado completo
-        xaxis=dict(title="<b>Distancia (km)</b>", showgrid=True, gridcolor='lightgray', linewidth=2, linecolor='black', mirror='all', showline=True),
-        yaxis=dict(title="<b>Presión (psia)</b>", showgrid=True, gridcolor='lightgray', linewidth=2, linecolor='black', mirror='all', showline=True)
+        # Marco rectángular cerrado completo
+        xaxis=dict(title="<b>Distancia (km)</b>", linewidth=2, linecolor='black', mirror='all', showline=True),
+        yaxis=dict(title="<b>Presión (psia)</b>", linewidth=2, linecolor='black', mirror='all', showline=True)
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -166,7 +170,7 @@ with t2:
                          title="<b>Distribución de Costos</b>", text_auto='.2s')
         fig_bar.update_layout(
             plot_bgcolor="white", showlegend=False,
-            # Marco cerrado completo
+            # Marco rectángular cerrado completo
             xaxis=dict(linewidth=2, linecolor='black', mirror='all', showline=True),
             yaxis=dict(linewidth=2, linecolor='black', mirror='all', showline=True)
         )
@@ -182,9 +186,10 @@ with t2:
     df_tabla.index = df_tabla.index + 1
     df_tabla["Costo Anual [USD]"] = df_tabla["Costo Anual [USD]"].map("${:,.2f}".format)
     df_tabla["Porcentaje (%)"] = (df_costos["Costo Anual [USD]"] / TAC * 100).map("{:.1f}%".format)
+    # Mostramos la tabla con el estilo unificado
     st.table(df_tabla)
 
-with t3: # [cite: 46-48]
+with t3:
     MAOP = (2 * TABLA_ACERO[grado]["SMYS"] * t_in * TABLA_ACERO[grado]["F"]) / d_ext_in
     if P_in > MAOP: st.error(f"❌ Riesgo MAOP: {P_in:.0f} > {MAOP:.0f} psia")
     else: st.success(f"✅ Presión Segura (MAOP: {MAOP:.0f} psia)")
