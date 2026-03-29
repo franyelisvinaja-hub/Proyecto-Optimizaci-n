@@ -131,7 +131,7 @@ for d in distancias:
         P_actual = P_in # Re-compresión en cada estación
     
     # Ecuación de Weymouth: P1^2 - P2^2 = factor * L
-    factor = 433.5 * (Q/E)**2 * (gamma * T * Z) / (D**5.33)
+    factor = 433.5 * (Q/E)**2 * (Gravedad_especifica * T * Z) / (D**5.33)
     P_calc = np.sqrt(max(1.0, P_in**2 - factor * dist_tramo))
     presiones.append(P_calc)
 
@@ -139,7 +139,7 @@ P_final = presiones[-1]
 
 # --- CÁLCULOS DE COMPRESIÓN Y COSTOS  ---
 P_suc = presiones[int(len(presiones)/N)-1] # Presión al final del primer tramo
-HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T1/(k-1)) * ((P_in/P_suc)**((k-1)/k) - 1)
+HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T/(k-1)) * ((P_in/P_succion)**((k-1)/k) - 1)
 HP_total = HP_estacion * N
 T_total = T * (P_in/P_suc)**((k-1)/k) - 273.15 # en Celsius
 
@@ -177,8 +177,8 @@ with t3: #
     if P_in > MAOP: st.error(f"❌ Riesgo MAOP: {P_in} > {MAOP:.0f} psia")
     else: st.success(f"✅ Presión Segura (MAOP: {MAOP:.0f} psia)")
     
-    if T2 > 65: st.error(f"❌ Alerta Térmica: {T2:.1f} °C > 65 °C")
-    else: st.success(f"✅ Temperatura Segura ({T2:.1f} °C)")
+    if T_total > 65: st.error(f"❌ Alerta Térmica: {T_total:.1f} °C > 65 °C")
+    else: st.success(f"✅ Temperatura Segura ({T_total:.1f} °C)")
     
     if P_final < P_min_entrega: st.error(f"❌ Presión insuficiente en entrega")
     else: st.success("✅ Entrega garantizada (>500 psia)")
