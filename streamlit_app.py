@@ -163,10 +163,9 @@ t1, t2, t3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "�
 with t1: # 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)"))
-    fig.add_hline(y=P_entrega, line_dash="dash", line_color="red")
+    fig.add_hline(y=P_entrega, line_dash="dash", line_color="red", showline=true)
     fig.update_layout(title="Perfil de Presión Weymouth", xaxis_title="<b>Distancia (km)</b>", yaxis_title="<b>Presión (psia)</b>")
-    st.plotly_chart(fig, use_container_width=True)
-    showline=true 
+    st.plotly_chart(fig, use_container_width=True) 
 
 with t2: # 
     st.bar_chart({"CAPEX Ducto": CAPEX_ducto*tasa, "CAPEX Comp": CAPEX_comp*tasa, "OPEX Energía": OPEX})
