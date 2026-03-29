@@ -19,7 +19,13 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: #87CEEB; 
         color: black;
+        div[data-testid="stWidgetLabel"] + div:hover {
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        transition: 0.3s;
     }
+
+    </style>
+    """, unsafe_allow_html=True)
 
     div[data-testid="stMetricValue"] {
         font-size: 28px;
@@ -96,6 +102,8 @@ with st.sidebar:
         Q = st.number_input("Flujo (Q) [MMscfd]", value=500.0)
         P_in = st.number_input("Presión de Entrada [psia]", value=800.0, step=50.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
+
+
 
 # VARIABLES BASE 
 L = 400.0                # Longitud (km)
