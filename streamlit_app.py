@@ -61,13 +61,15 @@ st.markdown("""
 st.markdown(
     """
     <div style="display: flex; justify-content: center;">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlEsUMrVI8P8nGd599JibaMJApD7xHLkeA3w&s" 
+        <img src="https://www.freepik.es/foto-gratis/vista-interior-fabrica-acero_1120217.htm#fromView=search&page=1&position=27&uuid=fa130987-2b10-429a-b819-b6a94f1dd209&query=transport+gas+natural+" 
         style="width:1280px; height:150px; object-fit: cover; border-radius: 10px;">
     </div>
-    """, 
-    unsafe_allow_html=True
-)
-
+      <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
+    </div>
+    <p style="color: #B0C4DE; font-size: 1.1em;">Transporte de Gas Natural</p>
+    """, unsafe_allow_html=True)
+st.markdown("---") 
+  
 # --- DATOS TÉCNICOS DEL PROYECTO  ---
 TABLA_TUBERIAS = {
     "12\"": {"D_ext": 323.8, "t": 10.31, "costo": 185},
