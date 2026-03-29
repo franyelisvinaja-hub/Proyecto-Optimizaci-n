@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
-# --- CONFIGURACIÓN DE LA PÁGINA [cite: 35] ---
+# --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Gemelo Digital: Gasoducto Trans-Andino", layout="wide")
 
-# --- DATOS TÉCNICOS DEL PROYECTO [cite: 23, 25] ---
+# --- DATOS TÉCNICOS DEL PROYECTO  ---
 TABLA_TUBERIAS = {
     "12\"": {"D_ext": 323.8, "t": 10.31, "costo": 185},
     "16\"": {"D_ext": 406.4, "t": 12.70, "costo": 260},
@@ -18,7 +18,7 @@ TABLA_ACERO = {
     "X60": {"SMYS": 60000, "F": 0.72}
 }
 
-# --- PANEL DE CONFIGURACIÓN (SIDEBAR) [cite: 36] ---
+# --- PANEL DE CONFIGURACIÓN (SIDEBAR)  ---
 with st.sidebar:
     st.header("⚙️ Configuración")
     
@@ -34,7 +34,7 @@ with st.sidebar:
         Q = st.number_input("Flujo (Q) [MMscfd]", value=500.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
-# --- VARIABLES BASE [cite: 14-20] ---
+# --- VARIABLES BASE ---
 L_total = 400.0  # km
 P_in = 800.0     # psia
 P_min_entrega = 500.0 # psia
@@ -46,7 +46,7 @@ k = 1.3          # Constante adiabática
 R = 10.73
 n_isentr = 0.75  # Eficiencia compresión
 
-# --- CÁLCULOS HIDRÁULICOS (Weymouth) [cite: 28] ---
+# --- CÁLCULOS HIDRÁULICOS (Weymouth)  ---
 d_ext_in = TABLA_TUBERIAS[d_nom]["D_ext"] / 25.4
 t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
 D = d_ext_in - 2 * t_in # Diámetro interno en pulgadas
@@ -69,22 +69,22 @@ for d in distancias:
 
 P_final = presiones[-1]
 
-# --- CÁLCULOS DE COMPRESIÓN Y COSTOS [cite: 31, 32] ---
+# --- CÁLCULOS DE COMPRESIÓN Y COSTOS  ---
 P_suc = presiones[int(len(presiones)/N)-1] # Presión al final del primer tramo
 HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z*R*T1/(k-1)) * ((P_in/P_suc)**((k-1)/k) - 1)
 HP_total = HP_estacion * N
 T2 = T1 * (P_in/P_suc)**((k-1)/k) - 273.15 # en Celsius
 
-# Costos (Simplificados para el ejemplo) [cite: 33]
+# Costos (Simplificados para el ejemplo) 
 CAPEX_ducto = TABLA_TUBERIAS[d_nom]["costo"] * L_total * 1000
 CAPEX_comp = HP_total * 1500 # 1500 USD/HP
 OPEX = HP_total * 0.7457 * 8760 * e_cost # kW * horas_año * costo
 TAC = (CAPEX_ducto + CAPEX_comp) * tasa + OPEX
 
-# --- VISUALIZACIÓN PRINCIPAL [cite: 40] ---
+# --- VISUALIZACIÓN PRINCIPAL  ---
 st.title("🏗️ Gemelo Digital: Gasoducto Trans-Andino")
 
-# 1. Dashboard de Métricas [cite: 41]
+# 1. Dashboard de Métricas 
 m1, m2, m3 = st.columns(3)
 m1.metric("TAC Total", f"${TAC/1e6:.2f} M USD")
 m2.metric("Potencia Total", f"{HP_total:,.0f} HP")
@@ -92,18 +92,18 @@ m3.metric("P. Entrega", f"{P_final:.1f} psia", delta=round(P_final-P_min_entrega
 
 t1, t2, t3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "🛡️ Seguridad"])
 
-with t1: # [cite: 42, 43]
+with t1: # 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)"))
     fig.add_hline(y=P_min_entrega, line_dash="dash", line_color="red")
     fig.update_layout(title="Perfil de Presión Weymouth", xaxis_title="Distancia (km)", yaxis_title="Presión (psia)")
     st.plotly_chart(fig, use_container_width=True)
 
-with t2: # [cite: 44]
+with t2: # 
     st.bar_chart({"CAPEX Ducto": CAPEX_ducto*tasa, "CAPEX Comp": CAPEX_comp*tasa, "OPEX Energía": OPEX})
 
-with t3: # [cite: 45]
-    # MAOP (Límite Barlow) [cite: 46]
+with t3: # 
+    # MAOP (Límite Barlow) 
     MAOP = (2 * TABLA_ACERO[grado]["SMYS"] * t_in * TABLA_ACERO[grado]["F"]) / d_ext_in
     
     if P_in > MAOP: st.error(f"❌ Riesgo MAOP: {P_in} > {MAOP:.0f} psia")
