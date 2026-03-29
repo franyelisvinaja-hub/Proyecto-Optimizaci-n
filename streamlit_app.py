@@ -163,7 +163,7 @@ t1, t2, t3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "�
 with t1: 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)"))
-    fig.add_hline(y=P_min_entrega, line_dash="dash", line_color="red")
+    fig.add_hline(y=P_entrega, line_dash="dash", line_color="red")
     
     fig.update_layout(
         title="<b>Perfil de Presión Weymouth</b>", # Título en negrita
