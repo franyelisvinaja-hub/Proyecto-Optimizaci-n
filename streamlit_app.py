@@ -58,7 +58,7 @@ st.markdown("""
 
 # --- 2. ENCABEZADO E IMÁGENES ---
 
-ruta_banner = "https://www.freepik.es/foto-gratis/vista-interior-fabrica-acero_1120217.png" 
+ruta_banner = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlEsUMrVI8P8nGd599JibaMJApD7xHLkeA3w&s" 
 st.image(ruta_banner, use_container_width=True)
 
 
