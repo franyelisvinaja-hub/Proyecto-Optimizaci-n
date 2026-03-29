@@ -57,17 +57,14 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- 2. ENCABEZADO E IMÁGENES ---
-ruta_banner = ""C:\Users\milei\Downloads\interior-view-steel-factory.jpg"" 
-st.image(ruta_banner, use_container_width=True)
-
-*/st.markdown(f"""
+st.markdown(f"""
     <div style="display: flex; align-items: center;">
         <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
         <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
     </div>
     <p style="color: #666; font-size: 1.1em;">Transporte de Gas Natural</p>
     """, unsafe_allow_html=True)
-st.markdown("---") */
+st.markdown("---") 
 
 # --- DATOS TÉCNICOS DEL PROYECTO  ---
 TABLA_TUBERIAS = {
