@@ -22,7 +22,7 @@ st.markdown("""
      } 
     /* Sombra en widgets del sidebar al pasar el mouse */
     [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] + div:hover {
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.3);
         transition: 0.3s;
     }
 
