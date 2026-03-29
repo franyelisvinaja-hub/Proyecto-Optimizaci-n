@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="Gasoducto Trans-Andino", layout="wide")
+st.set_page_config(page_title="Gasoducto Trans-Andino", page_icon= "👷🏼",layout="wide")
 
 # --- 1. PERSONALIZACIÓN DE INTERFAZ (CSS) ---
 st.markdown("""
@@ -18,8 +18,8 @@ st.markdown("""
 
     /* Color de fondo de la barra lateral */
     [data-testid="stSidebar"] {
-        background-color: #0e1117;
-        color: white;
+        background-color: #87CEEB; /*Azul cielo*/
+        color: black;
     }
 
     /* Estilo para las tarjetas de métricas */
@@ -33,6 +33,25 @@ st.markdown("""
         border-radius: 10px;
         border: none;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+      /* Color personalizado para st.error (Fallo de MAOP o Temperatura > 65°C) */
+        div[data-testid="stNotificationContentError"] {
+        background-color: #FDEDEC; /* Rojo muy suave */
+        color: #943126;           /* Texto granate */
+        border-left: 6px solid #CB4335; /* Barra lateral roja intensa */
+    }
+     /* Color personalizado para st.warning (Presión < 500 psia) */
+    div[data-testid="stNotificationContentWarning"] {
+        background-color: #FEF9E7; /* Amarillo muy suave */
+        color: #7D6608;           /* Texto ocre */
+        border-left: 6px solid #F4D03F; /* Barra lateral amarilla */
+    }
+
+    /* Color personalizado para st.success (Diseño óptimo) */
+    div[data-testid="stNotificationContentSuccess"] {
+        background-color: #EAFAF1; /* Verde muy suave */
+        color: #186A3B;           /* Texto verde oscuro */
+        border-left: 6px solid #27AE60; /* Barra lateral verde */
     }
     </style>
     """, unsafe_allow_html=True)
