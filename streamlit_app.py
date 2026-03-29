@@ -154,7 +154,7 @@ st.title("🏗️ Gasoducto Trans-Andino")
 
 # 1. Dashboard de Métricas 
 m1, m2, m3 = st.columns(3)
-m1.metric("TAC Total", f"${TAC/1e6:.0f} M USD")
+m1.metric("TAC Total", f"${TAC/1e6:,.0f} M USD")
 m2.metric("Potencia Total", f"{HP_total:,.0f} HP")
 m3.metric("P. Entrega", f"{P_final:.0f} psia", delta=round(P_final-P_entrega,1))
 
@@ -165,6 +165,7 @@ with t1: #
     fig.add_trace(go.Scatter(x=distancias, y=presiones, name="Presión (psia)"))
     fig.add_hline(y=P_entrega, line_dash="dash", line_color="red")
     fig.update_layout(title="Perfil de Presión Weymouth", xaxis_title="<b>Distancia (km)</b>", yaxis_title="<b>Presión (psia)</b>")
+    fig.showline(y=true, x=true)
     st.plotly_chart(fig, use_container_width=True)
 
 with t2: # 
