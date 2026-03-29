@@ -104,7 +104,23 @@ with st.sidebar:
         P_in = st.number_input("Presión de Entrada [psia]", value=800.0, step=50.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
+st.markdown("""
+    <style>
+    /* Aplicar sombra suave a los widgets del sidebar */
+    [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] + div {
+        border-radius: 8px;     
+        padding: 5px;            
+        box-shadow: 0 10px 15px rgba(0,0,0,0.4); 
+        border: 1px solid #f0f2f6; /* Borde muy sutil */
+    }
 
+    /* Efecto al pasar el mouse */
+    [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] + div:hover {
+        box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+        transition: 0.3s;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # VARIABLES BASE 
 L = 400.0                # Longitud (km)
