@@ -61,10 +61,10 @@ with st.sidebar:
         grado = st.selectbox("Grado de Acero", list(TABLA_ACERO.keys()))
     with st.expander("🚀 Operación", expanded=True):
         Q = st.number_input("Flujo (Q) [MMscfd]", value=500.0)
-        P_in = st.number_input("Presión de Entrada [psia]", value=800.0, step=50.0)
+        P_in = st.number_input("Presión de Entrada (P) [psia]", value=800.0, step=50.0)
         N = st.slider("N° Estaciones (N)", 1, 5, 2)
 
-# --- VARIABLES BASE [cite: 14-20] ---
+# --- VARIABLES BASE  ---
 L = 400.0
 P_min_entrega = 500.0 
 T_succion = 293.15
@@ -75,7 +75,7 @@ k = 1.3
 R_const = 10.73
 n_isentr = 0.75
 
-# --- CÁLCULOS HIDRÁULICOS (Weymouth) [cite: 28] ---
+# --- CÁLCULOS HIDRÁULICOS (Weymouth) ---
 d_ext_in = TABLA_TUBERIAS[d_nom]["D_ext"] / 25.4
 t_in = TABLA_TUBERIAS[d_nom]["t"] / 25.4
 D_int = d_ext_in - 2 * t_in 
@@ -89,7 +89,7 @@ for d in distancias:
     presiones.append(P_calc)
 P_final_real = presiones[-2] 
 
-# --- CÁLCULOS DE COMPRESIÓN Y COSTOS [cite: 31-33] ---
+# --- CÁLCULOS DE COMPRESIÓN Y COSTOS ---
 P_suc_real = presiones[int(len(presiones)/N)-1] 
 r_comp = P_in / P_suc_real
 HP_estacion = (Q * 10**6 / (24*3600*n_isentr)) * (Z * R_const * T_succion / (k - 1)) * ((r_comp)**((k - 1) / k) - 1)
@@ -105,9 +105,9 @@ TAC = CAPEX_ducto_anual + CAPEX_comp_anual + OPEX
 # --- VISUALIZACIÓN PRINCIPAL ---
 st.title("🏗️ Dashboard de Simulación")
 m1, m2, m3 = st.columns(3)
-m1.metric("TAC Total", f"${TAC/1e6:,.2f} M USD")
+m1.metric("TAC Total", f"${TAC/1e6:,.0f} M USD")
 m2.metric("Potencia Total", f"{HP_total:,.0f} HP")
-m3.metric("P. Entrega Final", f"{P_final_real:.1f} psia", delta=round(P_final_real - P_min_entrega, 1))
+m3.metric("P. Entrega Final", f"{P_final_real:.0f} psia", delta=round(P_final_real - P_min_entrega, 1))
 
 t1, t2, t3 = st.tabs(["📈 Perfil Hidráulico", "📊 Desglose de Costos", "🛡️ Seguridad"])
 
@@ -142,11 +142,11 @@ with t2:
                          title="<b>Peso del CAPEX vs OPEX</b>")
         st.plotly_chart(fig_pie, use_container_width=True)
     
-    # Tabla de Desglose [cite: 32]
+    # Tabla de Desglose 
     st.markdown("### 📋 Tabla de Resumen Económico")
     df_tabla = df_costos.copy()
-    df_tabla["Costo Anual [USD]"] = df_tabla["Costo Anual [USD]"].map("${:,.2f}".format)
-    df_tabla["Porcentaje (%)"] = (df_costos["Costo Anual [USD]"] / TAC * 100).map("{:.1f}%".format)
+    df_tabla["Costo Anual [USD]"] = df_tabla["Costo Anual [USD]"].map("${:,.0f}".format)
+    df_tabla["Porcentaje (%)"] = (df_costos["Costo Anual [USD]"] / TAC * 100).map("{:.0f}%".format)
     st.table(df_tabla)
 
 with t3:
