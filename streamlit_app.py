@@ -6,6 +6,48 @@ import plotly.graph_objects as go
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Gemelo Digital: Gasoducto Trans-Andino", layout="wide")
 
+# --- 1. PERSONALIZACIÓN DE INTERFAZ (CSS) ---
+st.markdown("""
+    <style>
+    /* Importar fuente moderna */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Color de fondo de la barra lateral */
+    [data-testid="stSidebar"] {
+        background-color: #0e1117;
+        color: white;
+    }
+
+    /* Estilo para las tarjetas de métricas */
+    div[data-testid="stMetricValue"] {
+        font-size: 28px;
+        color: #1f77b4;
+    }
+    
+    /* Personalización de los contenedores de alertas */
+    .stAlert {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- 2. ENCABEZADO E IMÁGENES ---
+# Puedes usar un logo desde una URL o un archivo local
+st.markdown(f"""
+    <div style="display: flex; align-items: center;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
+        <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
+    </div>
+    <p style="color: #666; font-size: 1.1em;">Gemelo Digital para la Simulación de Transporte de Gas Natural</p>
+    """, unsafe_allow_html=True)
+st.markdown("---")
+
 # --- DATOS TÉCNICOS DEL PROYECTO  ---
 TABLA_TUBERIAS = {
     "12\"": {"D_ext": 323.8, "t": 10.31, "costo": 185},
