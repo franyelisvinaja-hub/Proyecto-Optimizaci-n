@@ -64,7 +64,7 @@ st.markdown(
         <img src="https://www.aga.org/wp-content/uploads/2023/05/Natural-Gas-Transport.jpg" 
         style="width:1280px; height:150px; object-fit: cover; border-radius: 10px;">
     </div>
-      <h1 style="margin: 0; color: #4682B4; font-family: sans-serif;">
+      <h1 style="margin: 0; color: #2C3E50; font-family: sans-serif;">
             Sistema de Optimización Trans-Andino
         </h1>
     </div>
