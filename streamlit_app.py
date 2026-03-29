@@ -58,10 +58,23 @@ st.markdown("""
 
 # --- 2. ENCABEZADO E IMÁGENES ---
 
-banner = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlEsUMrVI8P8nGd599JibaMJApD7xHLkeA3w&s" 
-st.image(banner, width=150)
-
-
+st.markdown(
+    """
+    <div style="display: flex; justify-content: center;">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlEsUMrVI8P8nGd599JibaMJApD7xHLkeA3w&s" 
+        style="width:1280px; height:150px; object-fit: cover; border-radius: 10px;">
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
+st.markdown(f"""
+    <div style="display: flex; align-items: center;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3232/3232975.png" width="50" style="margin-right: 20px;">
+        <h1 style="margin: 0;">Sistema de Optimización Trans-Andino</h1>
+    </div>
+    <p style="color: #666; font-size: 1.1em;">Transporte de Gas Natural</p>
+    """, unsafe_allow_html=True)
+st.markdown("---
 # --- DATOS TÉCNICOS DEL PROYECTO  ---
 TABLA_TUBERIAS = {
     "12\"": {"D_ext": 323.8, "t": 10.31, "costo": 185},
